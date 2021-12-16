@@ -6,16 +6,18 @@ from threading import Thread
 from queue import Queue
 
 classNames= []
-classFile = 'coco.names'
+classFile = 'MobileNet/coco.names'
 with open(classFile,'rt') as f:
     classNames=[line.rstrip() for line in f]
-configPath = 'ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
-weightsPath = 'frozen_inference_graph.pb'   
+configPath = 'MobileNet/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
+weightsPath = 'MobileNet/frozen_inference_graph.pb'   
 
 
 def InputFramesThread(inputQueue,outputQueue,model,thres):
     model[0] = cv2.dnn_DetectionModel(weightsPath,configPath)
     model[0].setInputSize(320,320)
+    # model[0].setInputSize(640,480)
+
     model[0].setInputScale(1.0/ 127.5)
     model[0].setInputMean((127.5, 127.5, 127.5))
     model[0].setInputSwapRB(True)
@@ -67,9 +69,9 @@ def getObjectsCoordinates(coordinatesList):
     return objectCoordinates
 
 
-def getCoordinates():
+def getCoordinates(cap_right):
     thres = 0.6
-    cap = cv2.VideoCapture(0)  
+    # cap = cv2.VideoCapture(2)  
     #cap.set(3,1280)
     #cap.set(4,720)
     #cap.set(10,70) 
@@ -91,7 +93,9 @@ def getCoordinates():
     inputThread.start()
     while True:
         startTime = time.time()
-        success,img = cap.read()
+        success,img = cap_right.read()
+        # print(np.shape(img))
+        # img = cv2.resize(img,(320,320))
         inputQueue.put(img)
         
         if outputQueue.empty():
@@ -105,10 +109,12 @@ def getCoordinates():
             if len(model[1]) != 0:
                 # print("Num of BBox : ", len(model[3]))
                 for classId, confidence,box in zip(model[1].flatten(),model[2].flatten(),model[3]):
+                    # print(box)
+                    
                     cv2.rectangle(img,box,color=(0,255,0),thickness=2)
                     cv2.putText(img,classNames[classId-1].upper(),(box[0]+10,box[1]+30),
                     cv2.FONT_HERSHEY_COMPLEX,1,(0,255,0),2)
-                    coordinates.append(tuple((box[0],box[1],box[2],box[3],classNames[classId-1])))
+                    coordinates.append(tuple((box[0],box[1],box[2]+box[0],box[3]+box[1],classNames[classId-1])))
                     if (len(coordinates) % 60 == 0):
                         objects = getObjectsCoordinates(coordinates)
                         # print("60 coordinates found!")
@@ -122,9 +128,14 @@ def getCoordinates():
             fps = 1 / totalTime
             # print("FPS: ", fps)
             cv2.putText(img, f'FPS: {int(fps)}', (20,100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+            # cv2.namedWindow('Output',cv2.WINDOW_NORMAL)
+            # cv2.resizeWindow('Output',320,320)
+            # img = cv2.resize(img, (320,320))
             cv2.imshow('Output',img)
+            # time.sleep(1)
             if cv2.waitKey(25) & 0xFF == ord('q'):
-                    cv2.destroyAllWindows()
-                    break
+                    # cap_right.release()
+                    # cv2.destroyAllWindows()
+                    return objects
 
-coordinate = getCoordinates()
+# coordinate = getCoordinates()

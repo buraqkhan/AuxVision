@@ -2,13 +2,14 @@ import time
 import cv2
 import numpy as np
 import json
+from scipy.ndimage.filters import gaussian_filter
 from datetime import datetime
 #import rect
 
-rect_left = np.load('calibration/rectification_map_left.npy')
-rect_right = np.load('calibration/rectification_map_right.npy')
-und_left = np.load('calibration/undistortion_map_left.npy')   
-und_right = np.load('calibration/undistortion_map_right.npy')
+rect_left = np.load('stereo/calibration/rectification_map_left.npy')
+rect_right = np.load('stereo/calibration/rectification_map_right.npy')
+und_left = np.load('stereo/calibration/undistortion_map_left.npy')   
+und_right = np.load('stereo/calibration/undistortion_map_right.npy')
 
 print ("You can press Q to quit this script!")
 #time.sleep (5)
@@ -67,7 +68,7 @@ def stereo_depth_map(rectified_pair):
     disparity_fixtype = cv2.convertScaleAbs(disparity_grayscale, alpha=(255.0/65535.0))
     #disparity_test = cv2.morphologyEx(disparity_fixtype,cv2.MORPH_CLOSE, kernel) # Apply an morphological filter for closing little "black" holes in the picture(Remove noise) 
     disparity_color = cv2.applyColorMap(disparity_fixtype, cv2.COLORMAP_JET)
-
+    # blurred = gaussian_filter(disparity_color,sigma=10)
     
     # sigma = 1.5
     # lmbda = 8000.0
@@ -118,21 +119,24 @@ def load_map_settings( fName ):
 
 
 
-load_map_settings("3dmap_set.txt")
+load_map_settings("stereo/3dmap_set.txt")
 
-cap_right = cv2.VideoCapture(2)                    
-cap_left =  cv2.VideoCapture(4)
+# cap_right = cv2.VideoCapture(2)                    
+# cap_left =  cv2.VideoCapture(4)
 
-def runDisparity():
+def runDisparity(cap_right,cap_left):
 
     # while(cap_right.isOpened() and cap_left.isOpened()):
-    _, frame_right = cap_right.read()
-    _, frame_left = cap_left.read()
-    imgL = cv2.remap(frame_left, und_left, rect_left, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
-    imgR = cv2.remap(frame_right, und_right, rect_right, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)    
-    imgL_new = cv2.cvtColor(imgL, cv2.COLOR_BGR2GRAY)
-    imgR_new = cv2.cvtColor(imgR, cv2.COLOR_BGR2GRAY)
-    
-    rectified_pair = (imgL_new, imgR_new)
-    stereo_depth_map(rectified_pair)
-        #print(disparity[0][0])
+    i = 0
+    while(i < 100):
+        _, frame_right = cap_right.read()
+        _, frame_left = cap_left.read()
+        imgL = cv2.remap(frame_left, und_left, rect_left, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+        imgR = cv2.remap(frame_right, und_right, rect_right, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)    
+        imgL_new = cv2.cvtColor(imgL, cv2.COLOR_BGR2GRAY)
+        imgR_new = cv2.cvtColor(imgR, cv2.COLOR_BGR2GRAY)
+        
+        rectified_pair = (imgL_new, imgR_new)
+        stereo_depth_map(rectified_pair)
+            #print(disparity[0][0])
+        i += 1
