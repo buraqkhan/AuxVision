@@ -1,4 +1,5 @@
 from stereo import depth_video
+from TTS import tts
 import numpy as np
 from MobileNet.MobileNet import getCoordinates
 import cv2
@@ -62,9 +63,9 @@ def getDistances(_bounding_boxes):
 
     return distances
 
-def TTS():
-    # TTS module
-    pass
+def TTS(boundingBoxes, distances):
+    for i in range(len(boundingBoxes)):
+        tts.tts_object_location(boundingBoxes[i], distances[i])
 
 def main():
     cap_right = cv2.VideoCapture(2)                    
@@ -77,13 +78,13 @@ def main():
         # if cv2.waitKey(25) & 0xFF == ord('q'):
             # cv2.destroyAllWindows()
             # break
-        
-        print(getDistances(boundingBoxes))
+        distances = getDistances(boundingBoxes)
+        print(distances)
         # depth_video.runDisparity()
         #bb = [(350, 230, 570, 440, "chair"), (150, 11, 330, 450, "person")]
         # getBoundingBoxes()
         #print(getDistances(bb))
-        # TTS()
+        TTS(boundingBoxes, distances)
 
 if __name__ == "__main__":
     main()
