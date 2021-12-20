@@ -1,6 +1,6 @@
 from stereo import depth_video
 import numpy as np
-from MobileNet.StereoCamera import getCoordinates
+from MobileNet.MobileNet import getCoordinates
 import cv2
 # import MobileNet.mbnet 
 # from ..MobileNet.mbnet import getCoordinates

@@ -128,7 +128,7 @@ def runDisparity(cap_right,cap_left):
 
     # while(cap_right.isOpened() and cap_left.isOpened()):
     i = 0
-    while(i < 100):
+    while(i < 300):
         _, frame_right = cap_right.read()
         _, frame_left = cap_left.read()
         imgL = cv2.remap(frame_left, und_left, rect_left, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
