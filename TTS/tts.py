@@ -17,7 +17,7 @@ def calculateAngle(coordinates):
     p2 = (0,480)
     p3,p4 = coordinates[-2:]
     p5 = ((p3[0] + p4[0]) / 2, (p3[1] + p4[1]) / 2)
-    print("P5: ", p5)
+    # print("P5: ", p5)
     m1 = getGradient(p1,p2)
     m2 = getGradient(p1,p3)
     m3 = getGradient(p1,p4)
@@ -58,7 +58,7 @@ def tts_object_location(boundingBox, distance):
     engine.say(f'{Object}, {distance} centimeters away, at {angle} degrees')
     engine.runAndWait()
 
-param = (248, 153, 370, 155, "Chair")
-tts_object_location(param)
+#param = (248, 153, 370, 155, "Chair")
+#tts_object_location(param)
 
 # engine.say("I will speak this text")
