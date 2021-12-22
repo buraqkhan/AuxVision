@@ -75,7 +75,7 @@ def main():
         distances = getDistances(boundingBoxes)
         print(distances)
 
-        # bb = [(350, 230, 570, 440, "chair"), (150, 11, 330, 450, "person")]
+        # boundingBoxes = [(350, 230, 570, 440, "chair"), (150, 11, 330, 450, "person")]
         # distances = [('chair', 58), ('person', 100)]
 
         TTS(boundingBoxes, distances)
