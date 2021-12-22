@@ -5,6 +5,9 @@ import numpy as np
 from threading import Thread
 from queue import Queue
 
+'''
+    Loading MobileNet model and specifying the weights to be used.
+'''
 classNames= []
 classFile = 'MobileNet/coco.names'
 with open(classFile,'rt') as f:
@@ -12,7 +15,10 @@ with open(classFile,'rt') as f:
 configPath = 'MobileNet/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
 weightsPath = 'MobileNet/frozen_inference_graph.pb'   
 
-
+'''
+    Thread responsible for detecting and identifying objects in 
+    frames and adding them to the output queue.
+'''
 def InputFramesThread(inputQueue,outputQueue,model,thres):
     model[0] = cv2.dnn_DetectionModel(weightsPath,configPath)
     model[0].setInputSize(320,320)
@@ -26,6 +32,10 @@ def InputFramesThread(inputQueue,outputQueue,model,thres):
         model[1], model[2], model[3] = model[0].detect(img,confThreshold=thres)
         outputQueue.put(img)
 
+'''
+    Function responsible for checking which objects have been recently
+    detected and returning them.
+'''
 def getObjects(coordinatesList):
     objectsDetected = dict()
     # print(coordList[-5:])
@@ -48,6 +58,11 @@ def getObjects(coordinatesList):
 
     return mostFrequentObjects
 
+'''
+    Function responsible for finding coordinates of the recently identified 
+    objects. After finding the coordinates, it returns the most recent location.
+'''
+
 def getObjectsCoordinates(coordinatesList):
     recentCoordinates = []
     objectCoordinates = []
@@ -68,6 +83,11 @@ def getObjectsCoordinates(coordinatesList):
 
     return objectCoordinates
 
+'''
+    Main driver function responsible for getting bounding boxes 
+    which contain the object along with corresponding coordinates of
+    that object.
+'''
 
 def getCoordinates(cap_right):
     thres = 0.6

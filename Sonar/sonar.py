@@ -2,7 +2,13 @@ import time
 import serial
 import threading
 
-
+'''
+    Simple Moving Average.
+    Used to smooth the measurements as this helps avoid the noise
+    in the environment to which Ultrasonic sensor is susceptible to.
+    We keep it to two measurements so we can get readings faster 
+    and avoid hitting obstacle.
+'''
 class SMA:
     def __init__(self, window):
         self.window = window
@@ -18,32 +24,13 @@ class SMA:
     def __str__(self):
         return self.calculate()
 
-def parse_serial_line(line):
-    """
-    Not currently used. Kept for reference
-    :param line:2q
-    :return:
-    """
-
-    sensors = {}
-
-    for s in line.split(";"):
-
-        x = s.split(":")
-        try:
-            sensors[x[0]] = int(x[1])
-        except:
-            pass
-            # print('?', x)
-
-    return sensors
 
 def read_sensor_package(bytes_serial):
     """
     Read a sensor from serial bytes. Expected format is 5 bytes:
-        1, 2 : Package start 0x59 for YY
-        3 : unsigned integer for sensor index
-        4, 5 : unsigned integer for reading
+        1, 2 : The first two bytes indicate 'YY' to tell start of message.
+        3 : This byte is an unsigned integer for sensor index.
+        4, 5 : unsigned integers for reading distance.
     :return:
         sensor_index, reading
     """
@@ -56,23 +43,13 @@ def read_sensor_package(bytes_serial):
     else:
         return -1, None
 
-
+'''
+    Getting readings from sonars through this function which is assigned
+    a thread and storing them corresponding to the sensor they were
+    taken from.
+'''
 def read_serial(serial, sensors):
-    """
-    TODO: Upgrade to a class
-    :param serial:
-    :param sensors:
-    :return:
-    """
-
     while True:
-
-        # Read strings line by line
-        # ser_bytes = ser.readline()
-        # line = ser_bytes[0:len(ser_bytes) - 2].decode("ascii")
-        # sensors = parse_serial_line(line)
-        # print(f"\r {sensors}", end="")
-        # ser.flushInput()
 
         # Read by bytes
         counter = serial.in_waiting  # count the number of bytes of the serial port
@@ -90,6 +67,15 @@ def read_serial(serial, sensors):
                     sensors[sensor_index].append(sensor_reading)
 
 
+'''
+    Main driver function for Ultrasonic sensor.
+    We select the port at which Arduino is connected, assign thread to
+    function which takes readings from sensors and stores them and
+    calculate distance. Based on current distance to object, feedback
+    is given by a beep whose frequency varies depending on distance i.e. 
+    more frequent beeps if closer and less frequent if further away from
+    user.
+'''
 
 if __name__ == "__main__":
 
