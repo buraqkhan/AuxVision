@@ -41,7 +41,9 @@ To run the code execute the following
 
 ### Collaborators
 [Ali Asghar](https://github.com/aliasghar98)
+
 [Affan Arif](https://github.com/affan-ansari)
+
 [Buraq Khan](https://github.com/buraqkhan)
 
 ### Supervised by
