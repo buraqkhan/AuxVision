@@ -2,3 +2,4 @@ ObjectDetection/tensorflow/object_detection/ssd_inception_v2_coco_2017_11_17.tar
 ObjectDetection/tensorflow/object_detection/ssd_mobilenet_v1_coco_11_06_2017.tar.gz
 *.pyc
 ObjectDetection
+__pycache__
