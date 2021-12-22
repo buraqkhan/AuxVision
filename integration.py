@@ -79,7 +79,7 @@ def main():
             # cv2.destroyAllWindows()
             # break
         distances = getDistances(boundingBoxes)
-        print(getDistances(boundingBoxes))
+        print(distances)
         # depth_video.runDisparity()
         # bb = [(350, 230, 570, 440, "chair"), (150, 11, 330, 450, "person")]
         # distances = [('chair', 58), ('person', 100)]
