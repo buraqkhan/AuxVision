@@ -1,5 +1,0 @@
-conda activate py36
-# Write below command in tensorflow folder.
-export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
-cd object_detection
-python demo.py
