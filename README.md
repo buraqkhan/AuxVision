@@ -5,7 +5,7 @@
 
 
 
-![FYPPoster-F21-27-D-AuxVision.jpg](../_resources/FYPPoster-F21-27-D-AuxVision.jpg)
+![FYPPoster-F21-27-D-AuxVision.jpg](FYPPoster-F21-27-D-AuxVision.jpg)
 
 ---
 
