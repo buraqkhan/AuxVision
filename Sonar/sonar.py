@@ -93,7 +93,7 @@ def read_serial(serial, sensors):
 
 if __name__ == "__main__":
 
-    _serial = serial.Serial('COM4', 115200, timeout=1)
+    _serial = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
     _serial.flushInput()
 
     sensors = {}
@@ -105,7 +105,13 @@ if __name__ == "__main__":
 
         for k, v in sensors.items():
             print(f"Sonar {k}: {v.calculate()} cm ", end="")
-            print()
-        print()
+            dist = v.calculate()
+            if dist > 50 and dist < 100:
+                print('\a')
+                time.sleep(0.7)
+            elif dist < 50:
+                print('\a')
+                time.sleep(0.25)
+            
 
         time.sleep(0.2)
