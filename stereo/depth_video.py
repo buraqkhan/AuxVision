@@ -12,7 +12,6 @@ und_left = np.load('stereo/calibration/undistortion_map_left.npy')
 und_right = np.load('stereo/calibration/undistortion_map_right.npy')
 
 print ("You can press Q to quit this script!")
-#time.sleep (5)
 
 # Depth map default preset
 SWS = 5
@@ -25,7 +24,7 @@ UR = 10
 SR = 14
 SPWS = 100
 
-# Use the whole image or a stripe for depth map?
+# Values to improve results
 dm_colors_autotune = True
 disp_max = -100000
 disp_min = 10000
@@ -35,6 +34,7 @@ disparity = np.zeros((640, 480), np.uint8)
 sbm = cv2.StereoBM_create(numDisparities=0, blockSize=21)
 kernel = np.ones((3,3),np.uint8)
 
+''' Function used to get distance at a particular pixel '''
 def save_distance(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDBLCLK:
         average = 0
@@ -47,7 +47,7 @@ def save_distance(event, x, y, flags, param):
         print(average)
         print(distance)        
 
-
+''' Generates depth map using the stereo camera '''
 def stereo_depth_map(rectified_pair):
     global disp_max
     global disp_min
@@ -70,6 +70,8 @@ def stereo_depth_map(rectified_pair):
     disparity_color = cv2.applyColorMap(disparity_fixtype, cv2.COLORMAP_JET)
     # blurred = gaussian_filter(disparity_color,sigma=10)
     
+    ################## Testing different Functionality below ############################
+    
     # sigma = 1.5
     # lmbda = 8000.0
     # right_matcher = cv2.ximgproc.createRightMatcher(sbm);
@@ -82,14 +84,16 @@ def stereo_depth_map(rectified_pair):
     # filtered_disp = wls_filter.filter(disparity, dmLeft, disparity_map_right=right_disp);
     # filtered_disp = filtered_disp.astype(np.uint8)
     # filtered_disp = cv2.applyColorMap(filtered_disp, cv2.COLORMAP_JET)
-# 
+
+    #####################################################################################
+
     cv2.imshow("Image", disparity_color)
     cv2.setMouseCallback("Image", save_distance, disparity_color) # Mouse click
     key = cv2.waitKey(1) & 0xFF   
     if key == ord("q"):
         quit();
-    # return disparity_color
 
+# Loading saved Disparity parameters (Based on Individual settings)
 def load_map_settings( fName ):
     global SWS, PFS, PFC, MDS, NOD, TTH, UR, SR, SPWS, loading_settings
     print('Loading parameters from file...')
@@ -117,22 +121,16 @@ def load_map_settings( fName ):
     f.close()
     print ('Parameters loaded from file '+fName)
 
-
-
 load_map_settings("stereo/3dmap_set.txt")
-
-# cap_right = cv2.VideoCapture(2)                    
-# cap_left =  cv2.VideoCapture(4)
 
 def runDisparity(cap_right,cap_left):
 
-    # while(cap_right.isOpened() and cap_left.isOpened()):
     i = 0
     while(i < 300):
         _, frame_right = cap_right.read()
         _, frame_left = cap_left.read()
-        imgL = cv2.remap(frame_left, und_left, rect_left, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
-        imgR = cv2.remap(frame_right, und_right, rect_right, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)    
+        imgL = cv2.remap(frame_left, und_left, rect_left, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT) # rectify left image
+        imgR = cv2.remap(frame_right, und_right, rect_right, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT) # rectify right image
         imgL_new = cv2.cvtColor(imgL, cv2.COLOR_BGR2GRAY)
         imgR_new = cv2.cvtColor(imgR, cv2.COLOR_BGR2GRAY)
         

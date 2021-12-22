@@ -3,21 +3,17 @@ from TTS import tts
 import numpy as np
 from MobileNet.MobileNet import getCoordinates
 import cv2
-# import MobileNet.mbnet 
-# from ..MobileNet.mbnet import getCoordinates
-# import sys
-# sys.path.insert(0,'/home/ali/Desktop/AuxVision-Final/AuxVision/MobileNet/')
-# from MobileNet import mbnet
-# from ..MobileNet import mbnet
+
 '''
-One function handles finding bounding boxes and calling the next function.
-The other function then maps the output onto the depth map.
-The output of this depth map will then be sent to the TTS module.
-Put sleep(10) in between function calls.
-Use openmp for threading? Update: Openmp doesn't exist in python
-                                  Use multiprocessing for different functions instead? 
+    Main file that runs all the functionality.
+    Driver Function (Main):
+        1) getBoundingBoxes() called first, returns bounding boxes from the video feed.
+        2) runDisparity() starts up the depth map, which returns depth values.
+        3) getDistances() return the actual distance values of the objects detected.
+        4) The output will then be sent to the TTS module using TTS(). 
 '''
 
+''' =========  Different Test Functions (Not relevant for this iteration) ===========  '''
 # def getAvgDistance(x1, y1, x2, y2, name):
 #     bounding_box = depth_video.disparity[x1:x2, y1:y2]
 #     average = np.median(bounding_box)
@@ -41,7 +37,8 @@ Use openmp for threading? Update: Openmp doesn't exist in python
     # print(average)
     # distance = 420 + (1.3 * average) + (0.00168 * average**2)
     # return (name, distance)
-
+''' =============================================================================   '''
+ 
 def getAvgDistance(x1, y1, x2, y2, name):
     mid_x = int((x1 + x2)/2)
     mid_y = int((y1 + y2)/2)
@@ -70,21 +67,17 @@ def TTS(boundingBoxes, distances):
 def main():
     cap_right = cv2.VideoCapture(2)                    
     cap_left =  cv2.VideoCapture(4)
+    
     while(True):
         boundingBoxes = getBoundingBoxes(cap_right)
         print(boundingBoxes)
         depth_video.runDisparity(cap_right,cap_left)
-        # getDistances(boundingBox)
-        # if cv2.waitKey(25) & 0xFF == ord('q'):
-            # cv2.destroyAllWindows()
-            # break
         distances = getDistances(boundingBoxes)
         print(distances)
-        # depth_video.runDisparity()
+
         # bb = [(350, 230, 570, 440, "chair"), (150, 11, 330, 450, "person")]
         # distances = [('chair', 58), ('person', 100)]
-        # getBoundingBoxes()
-        # print(getDistances(bb))
+
         TTS(boundingBoxes, distances)
         break
 

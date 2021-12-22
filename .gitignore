@@ -3,3 +3,6 @@ ObjectDetection/tensorflow/object_detection/ssd_mobilenet_v1_coco_11_06_2017.tar
 *.pyc
 ObjectDetection
 __pycache__
+stereo/depth_estimate.py
+stereo/mediapipe.py
+stereo/test_stereo.py
