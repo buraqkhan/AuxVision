@@ -71,21 +71,21 @@ def main():
     cap_right = cv2.VideoCapture(2)                    
     cap_left =  cv2.VideoCapture(4)
     while(True):
-        # boundingBoxes = getBoundingBoxes(cap_right)
-        # print(boundingBoxes)
-        # depth_video.runDisparity(cap_right,cap_left)
+        boundingBoxes = getBoundingBoxes(cap_right)
+        print(boundingBoxes)
+        depth_video.runDisparity(cap_right,cap_left)
         # getDistances(boundingBox)
         # if cv2.waitKey(25) & 0xFF == ord('q'):
             # cv2.destroyAllWindows()
             # break
-        # distances = getDistances(boundingBoxes)
-        # print(getDistances(boundingBoxes))
+        distances = getDistances(boundingBoxes)
+        print(getDistances(boundingBoxes))
         # depth_video.runDisparity()
-        bb = [(350, 230, 570, 440, "chair"), (150, 11, 330, 450, "person")]
-        distances = [('chair', 58), ('person', 100)]
+        # bb = [(350, 230, 570, 440, "chair"), (150, 11, 330, 450, "person")]
+        # distances = [('chair', 58), ('person', 100)]
         # getBoundingBoxes()
         # print(getDistances(bb))
-        TTS(bb, distances)
+        TTS(boundingBoxes, distances)
         break
 
 if __name__ == "__main__":

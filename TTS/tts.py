@@ -47,7 +47,7 @@ engine = pyttsx3.init()
 rate = engine.getProperty('rate')
 engine.setProperty('rate', 165)
 voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)
+engine.setProperty('voice', "english")
 
 def tts_object_location(boundingBox, distance):
     c1 = list(boundingBox[:2])
@@ -55,7 +55,7 @@ def tts_object_location(boundingBox, distance):
     coordinates = [c1,c2]
     Object = boundingBox[-1]
     angle = calculateAngle(coordinates) # coordinates[leftx,lefty,rightx,righty]
-    engine.say(f'{Object}, {distance} centimeters away, at {angle} degrees')
+    engine.say(f'{Object}, {int(distance)} centimeters away, at {angle} degrees')
     engine.runAndWait()
 
 #param = (248, 153, 370, 155, "Chair")
