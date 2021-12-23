@@ -1,5 +1,6 @@
 import math
 import pyttsx3
+import numpy as np
 
 def getGradient(p1,p2):
     numerator = p2[1] - p1[1]
@@ -43,16 +44,17 @@ def calculateAngle(coordinates):
 # Setting voice engine properties
 engine = pyttsx3.init()
 rate = engine.getProperty('rate')
-engine.setProperty('rate', 165)
+engine.setProperty('rate', 140)
 voices = engine.getProperty('voices')
 engine.setProperty('voice', "english")
 
 # Main TTS function speaking object name, location and distance
 def tts_object_location(boundingBox, distance):
+    distance = np.round_((distance / 100))
     c1 = list(boundingBox[:2])
     c2 = list(boundingBox[2:4])
     coordinates = [c1,c2]
     Object = boundingBox[-1]
     angle = calculateAngle(coordinates) # coordinates[leftx,lefty,rightx,righty]
-    engine.say(f'{Object}, {int(distance)} centimeters away, at {angle} degrees')
+    engine.say(f'{Object}, approximately {distance} meters away, at {angle} degrees')
     engine.runAndWait()
