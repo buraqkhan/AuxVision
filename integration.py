@@ -69,14 +69,14 @@ def main():
     cap_left =  cv2.VideoCapture(4)
     
     while(True):
-        # boundingBoxes = getBoundingBoxes(cap_right)
-        # print(boundingBoxes)
-        # depth_video.runDisparity(cap_right,cap_left)
-        # distances = getDistances(boundingBoxes)
-        # print(distances)
+        boundingBoxes = getBoundingBoxes(cap_right)
+        print(boundingBoxes)
+        depth_video.runDisparity(cap_right,cap_left)
+        distances = getDistances(boundingBoxes)
+        print(distances)
 
-        boundingBoxes = [(350, 230, 570, 440, "chair"), (150, 11, 330, 450, "person")]
-        distances = [('chair', 158), ('person', 230)]
+        # boundingBoxes = [(350, 230, 570, 440, "chair"), (150, 11, 330, 450, "person")]
+        # distances = [('chair', 158), ('person', 230)]
 
         TTS(boundingBoxes, distances)
         break
