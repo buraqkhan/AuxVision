@@ -11,10 +11,10 @@ import sys
 import time
 import cv2
 
-# def DrawBoundingBox(coordinates):
 
+with open("key.txt","r") as keyfile:
+    subscription_key=keyfile.readline()
 
-subscription_key = "3dfd948f62fd4d2f92d0c7ff39795e8c"
 endpoint = "https://auxvision.cognitiveservices.azure.com/"
 images_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)),"images")
 
@@ -46,5 +46,3 @@ else:
         cv2.putText(myimg,label,(x1,y1),cv2.FONT_HERSHEY_COMPLEX,0.5,(0,0,0),1)
 cv2.imshow('sample image',myimg)
 cv2.waitKey(0)
-
-print()
