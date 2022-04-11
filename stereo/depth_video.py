@@ -43,7 +43,7 @@ def save_distance(event, x, y, flags, param):
                 average += disparity[y+u,x+v]
                 #print(disparity[y+u,x+v])
         average=average/9
-        distance = 420 + (1.3 * average) + (0.00168 * average**2)
+        distance = 787 + (-1.5 * average) + (0.000909 * average**2)
         print(average)
         print(distance)        
 
