@@ -43,7 +43,7 @@ def save_distance(event, x, y, flags, param):
                 average += disparity[y+u,x+v]
                 #print(disparity[y+u,x+v])
         average=average/9
-        distance = 787 + (-1.5 * average) + (0.000909 * average**2)
+        distance = 691 + (-1.59 * average) + (0.00116 * average**2)
         print(average)
         print(distance)        
 
@@ -123,18 +123,13 @@ def load_map_settings( fName ):
 
 load_map_settings("stereo/3dmap_set.txt")
 
-def runDisparity(cap_right,cap_left):
-
+def runDisparity(frame_right,frame_left):
     i = 0
     while(i < 300):
-        _, frame_right = cap_right.read()
-        _, frame_left = cap_left.read()
         imgL = cv2.remap(frame_left, und_left, rect_left, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT) # rectify left image
         imgR = cv2.remap(frame_right, und_right, rect_right, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT) # rectify right image
         imgL_new = cv2.cvtColor(imgL, cv2.COLOR_BGR2GRAY)
         imgR_new = cv2.cvtColor(imgR, cv2.COLOR_BGR2GRAY)
-        
         rectified_pair = (imgL_new, imgR_new)
         stereo_depth_map(rectified_pair)
-            #print(disparity[0][0])
         i += 1

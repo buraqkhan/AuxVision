@@ -56,5 +56,7 @@ def tts_object_location(boundingBox, distance):
     coordinates = [c1,c2]
     Object = boundingBox[-1]
     angle = calculateAngle(coordinates) # coordinates[leftx,lefty,rightx,righty]
-    engine.say(f'{Object}, approximately {distance} meters away, at {angle} degrees')
-    engine.runAndWait()
+    message = f"{Object} approximately {distance} meters away at {angle} degrees,"
+    return message
+    # engine.say(f'{Object}, approximately {distance} meters away, at {angle} degrees')
+    # engine.runAndWait()

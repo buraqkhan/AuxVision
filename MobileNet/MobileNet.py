@@ -80,8 +80,9 @@ def getObjectsCoordinates(coordinatesList):
     that object.
 '''
 
-def getCoordinates(cap_right):
+def getCoordinates(frame_right):
     thres = 0.6
+    count = 0
     inputQueue = Queue(2)
     outputQueue = Queue()
     coordinates = []
@@ -98,30 +99,35 @@ def getCoordinates(cap_right):
     inputThread = Thread(target=InputFramesThread, args= (inputQueue,outputQueue,model,thres))
     inputThread.daemon = True
     inputThread.start()
+    timeout = 0
     while True:
-        startTime = time.time()
-        success,img = cap_right.read()
+        img = frame_right
         inputQueue.put(img)
-        
         if outputQueue.empty():
             pass
         else:
             tempImg = outputQueue.get()
+            
             if len(model[1]) != 0:
-                for classId, confidence,box in zip(model[1].flatten(),model[2].flatten(),model[3]):
-                    
+                for classId, confidence,box in zip(model[1].flatten(),model[2].flatten(),model[3]):  
                     cv2.rectangle(img,box,color=(0,255,0),thickness=2)
                     cv2.putText(img,classNames[classId-1].upper(),(box[0]+10,box[1]+30),
                     cv2.FONT_HERSHEY_COMPLEX,1,(0,255,0),2)
                     coordinates.append(tuple((box[0],box[1],box[2]+box[0],box[3]+box[1],classNames[classId-1])))
+                    
                     if (len(coordinates) % 60 == 0):
                         objects = getObjectsCoordinates(coordinates)
                         print(objects)
-            endTime = time.time()
-            totalTime = endTime - startTime
-            fps = 1 / totalTime
-            cv2.putText(img, f'FPS: {int(fps)}', (20,100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
-            cv2.imshow('Output',img)
-            if cv2.waitKey(25) & 0xFF == ord('q'):
-                    
-                    return objects
+                        count = count + 1
+                        if count == 3:
+                            timeout = 0
+                            cv2.imshow('Output',img)
+                            while timeout < 350:
+                                timeout = timeout + 1
+                            return objects
+            timeout = timeout + 1
+            if timeout == 250:
+                break
+            # cv2.imshow('Output',img)
+            # if cv2.waitKey(25) & 0xFF == ord('q'):
+            #     return objects

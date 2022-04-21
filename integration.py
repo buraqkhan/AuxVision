@@ -1,9 +1,15 @@
+import copy
 from stereo import depth_video
 from TTS import tts
 import numpy as np
 from MobileNet.MobileNet import getCoordinates
 import cv2
-
+import socket
+import struct
+import pickle
+from threading import Thread
+from queue import Queue
+from time import sleep
 '''
     Main file that runs all the functionality.
     Driver Function (Main):
@@ -38,7 +44,41 @@ import cv2
     # distance = 420 + (1.3 * average) + (0.00168 * average**2)
     # return (name, distance)
 ''' =============================================================================   '''
- 
+HOST = "192.168.100.70"  # Standard loopback interface address (localhost)
+PORT = 65431  # Port to listen on (non-privileged ports are > 1023)
+s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s.bind((HOST, PORT))
+s.listen()
+conn, addr = s.accept()
+def runServer():
+    data = b""
+    payload_size = struct.calcsize(">L")
+    img_received = "right"
+    print("Server is now running!")
+    print("I am now trying to receive image...")
+    while len(data) < payload_size:
+        data += conn.recv(4096)
+
+    packed_msg_size = data[:payload_size]
+    data = data[payload_size:]
+    msg_size = struct.unpack(">L",packed_msg_size)[0]
+    while len(data) < msg_size:
+        data += conn.recv(4096)
+    frame_data = data[:msg_size]
+    data = data[msg_size:]
+    frame = pickle.loads(frame_data,fix_imports=True,encoding="bytes")
+    frame = copy.deepcopy(cv2.imdecode(frame,cv2.IMREAD_COLOR))
+    print("Image received from " , img_received , " camera.")
+    conn.sendall(bytes(img_received,'utf-8'))
+    if img_received == "left":
+        img_received = "right"
+    elif img_received == "right":
+        img_received = "left"
+
+    my_image = None
+    my_image = copy.deepcopy(frame)
+    return my_image
+
 def getAvgDistance(x1, y1, x2, y2, name):
     mid_x = int((x1 + x2)/2)
     mid_y = int((y1 + y2)/2)
@@ -47,9 +87,9 @@ def getAvgDistance(x1, y1, x2, y2, name):
     distance = 420 + (1.3 * average) + (0.00168 * average**2)
     return (name, distance)
 
-def getBoundingBoxes(cap_right):
+def getBoundingBoxes(frame_right):
     # Call Image model here 
-    return getCoordinates(cap_right)
+    return getCoordinates(frame_right)
 
 def getDistances(_bounding_boxes):
     # Map co-ordinates or center points to the depth map
@@ -61,25 +101,51 @@ def getDistances(_bounding_boxes):
     return distances
 
 def TTS(boundingBoxes, distances):
+    messages = []
     for i in range(len(boundingBoxes)):
-        tts.tts_object_location(boundingBoxes[i], distances[i][1])
+        messages.append(tts.tts_object_location(boundingBoxes[i], distances[i][1]))
+    return messages
 
 def main():
-    cap_right = cv2.VideoCapture(2)                    
-    cap_left =  cv2.VideoCapture(4)
-    
     while(True):
-        boundingBoxes = getBoundingBoxes(cap_right)
+        frame_right = runServer()
+        frame_left = runServer()
+        print("Frames have been gotten!")
+            
+        boundingBoxes = getBoundingBoxes(frame_right)
+        if boundingBoxes is None:
+            print("No object found!") 
+            conn.sendall(bytes("No objects found,",'utf-8')) 
+            continue
+        print("Bounding boxes have been found!")
         print(boundingBoxes)
-        depth_video.runDisparity(cap_right,cap_left)
+
+        depth_video.runDisparity(frame_right,frame_left)
+        print("Depth has been done!")
+
         distances = getDistances(boundingBoxes)
+        print("Distances have been found!")
         print(distances)
 
-        # boundingBoxes = [(350, 230, 570, 440, "chair"), (150, 11, 330, 450, "person")]
-        # distances = [('chair', 158), ('person', 230)]
+        feedback = ""
+        messages = TTS(boundingBoxes, distances)
+        for message in messages: 
+            feedback += message
+        print(messages)
+        if len(messages) >= 1:
+            conn.sendall(bytes(feedback,'utf-8'))
+        else: 
+            print("No object found!") 
+            conn.sendall(bytes("No objects found,",'utf-8'))  
+        print("TTS is done!")
 
-        TTS(boundingBoxes, distances)
-        break
+        cv2.destroyAllWindows()
+
+        if cv2.waitKey(25) & 0xFF == ord('q'):
+            break
+
+    conn.sendall(bytes("end",'UTF-8'))
+    s.close()
 
 if __name__ == "__main__":
     main()
