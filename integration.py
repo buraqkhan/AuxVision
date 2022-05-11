@@ -4,6 +4,13 @@ import numpy as np
 from MobileNet.MobileNet import getCoordinates
 import cv2
 
+import sys
+import os
+
+sys.path.append(os.getcwd() + '/obj_detect_pi')
+
+from obj_detect_pi.detect import tf_run
+
 '''
     Main file that runs all the functionality.
     Driver Function (Main):
@@ -47,21 +54,22 @@ def TTS(boundingBoxes, distances):
         tts.tts_object_location(boundingBoxes[i], distances[i][1])
 
 def main():
-    cap_right = cv2.VideoCapture(2)                    
-    cap_left =  cv2.VideoCapture(4)
+    tf_run()
+    # cap_right = cv2.VideoCapture(2)                    
+    # cap_left =  cv2.VideoCapture(4)
     
-    while(True):
-        boundingBoxes = getBoundingBoxes(cap_right)
-        print(boundingBoxes)
-        depth_video.runDisparity(cap_right,cap_left)
-        distances = getDistances(boundingBoxes)
-        print(distances)
+    # while(True):
+    #     boundingBoxes = getBoundingBoxes(cap_right)
+    #     print(boundingBoxes)
+    #     depth_video.runDisparity(cap_right,cap_left)
+    #     distances = getDistances(boundingBoxes)
+    #     print(distances)
 
-        # boundingBoxes = [(350, 230, 570, 440, "chair"), (150, 11, 330, 450, "person")]
-        # distances = [('chair', 158), ('person', 230)]
+    #     # boundingBoxes = [(350, 230, 570, 440, "chair"), (150, 11, 330, 450, "person")]
+    #     # distances = [('chair', 158), ('person', 230)]
 
-        TTS(boundingBoxes, distances)
-        break
+    #     TTS(boundingBoxes, distances)
+    #     break
 
 if __name__ == "__main__":
     main()
