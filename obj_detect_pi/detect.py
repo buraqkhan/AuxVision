@@ -8,7 +8,7 @@ from .object_detector import ObjectDetectorOptions
 from . import utils
 
 
-def tf_run(model = 'obj_detect_pi/efficientdet_lite0.tflite', camera_id = 0, width = 550, height = 370, num_threads = 4,
+def tf_run(feed, model = 'obj_detect_pi/efficientdet_lite0.tflite', camera_id = 0, width = 550, height = 370, num_threads = 4,
         enable_edgetpu = False):
   """Continuously run inference on images acquired from the camera.
 
@@ -25,9 +25,10 @@ def tf_run(model = 'obj_detect_pi/efficientdet_lite0.tflite', camera_id = 0, wid
   start_time = time.time()
 
   # Start capturing video input from the camera
-  cap = cv2.VideoCapture(camera_id)
-  cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-  cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+  # cap = cv2.VideoCapture(camera_id)
+  # cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+  # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+  cap = feed
 
   # Visualization parameters
   row_size = 20  # pixels

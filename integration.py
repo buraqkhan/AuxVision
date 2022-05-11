@@ -54,12 +54,12 @@ def TTS(boundingBoxes, distances):
         tts.tts_object_location(boundingBoxes[i], distances[i][1])
 
 def main():
-    tf_run()
-    # cap_right = cv2.VideoCapture(2)                    
+    cap_right = cv2.VideoCapture(0)                    
     # cap_left =  cv2.VideoCapture(4)
+    # tf_run(cap_right)
     
     # while(True):
-    #     boundingBoxes = getBoundingBoxes(cap_right)
+    #     boundingBoxes = tf_run(cap_right)
     #     print(boundingBoxes)
     #     depth_video.runDisparity(cap_right,cap_left)
     #     distances = getDistances(boundingBoxes)
