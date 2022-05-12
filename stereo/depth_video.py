@@ -2,7 +2,6 @@ import time
 import cv2
 import numpy as np
 import json
-from scipy.ndimage.filters import gaussian_filter
 from datetime import datetime
 #import rect
 
@@ -12,6 +11,7 @@ und_left = np.load('stereo/calibration/undistortion_map_left.npy')
 und_right = np.load('stereo/calibration/undistortion_map_right.npy')
 
 print ("You can press Q to quit this script!")
+#time.sleep (5)
 
 # Depth map default preset
 SWS = 5
@@ -24,17 +24,16 @@ UR = 10
 SR = 14
 SPWS = 100
 
-# Values to improve results
+# Use the whole image or a stripe for depth map?
 dm_colors_autotune = True
 disp_max = -100000
 disp_min = 10000
 
 
-disparity = np.zeros((640, 480), np.uint8)
+disparity = np.zeros((550, 370), np.uint8)
 sbm = cv2.StereoBM_create(numDisparities=0, blockSize=21)
 kernel = np.ones((3,3),np.uint8)
 
-''' Function used to get distance at a particular pixel '''
 def save_distance(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDBLCLK:
         average = 0
@@ -43,11 +42,11 @@ def save_distance(event, x, y, flags, param):
                 average += disparity[y+u,x+v]
                 #print(disparity[y+u,x+v])
         average=average/9
-        distance = 691 + (-1.59 * average) + (0.00116 * average**2)
+        distance = 677 - (2.12 *average) + (2.12 + 0.00216 * average ** 2)
         print(average)
         print(distance)        
 
-''' Generates depth map using the stereo camera '''
+
 def stereo_depth_map(rectified_pair):
     global disp_max
     global disp_min
@@ -64,13 +63,11 @@ def stereo_depth_map(rectified_pair):
         local_min = disp_min
         #print(disp_max, disp_min)
     disparity_grayscale = (disparity-local_min)*(65535.0/(local_max-local_min))
-    #disparity_grayscale = (disparity+208)*(65535.0/1000.0) # test for jumping colors prevention 
+    # disparity_grayscale = (disparity+208)*(65535.0/1000.0) # test for jumping colors prevention 
     disparity_fixtype = cv2.convertScaleAbs(disparity_grayscale, alpha=(255.0/65535.0))
-    #disparity_test = cv2.morphologyEx(disparity_fixtype,cv2.MORPH_CLOSE, kernel) # Apply an morphological filter for closing little "black" holes in the picture(Remove noise) 
+    disparity_test = cv2.morphologyEx(disparity_fixtype,cv2.MORPH_CLOSE, kernel) # Apply an morphological filter for closing little "black" holes in the picture(Remove noise) 
     disparity_color = cv2.applyColorMap(disparity_fixtype, cv2.COLORMAP_JET)
-    # blurred = gaussian_filter(disparity_color,sigma=10)
-    
-    ################## Testing different Functionality below ############################
+
     
     # sigma = 1.5
     # lmbda = 8000.0
@@ -84,16 +81,14 @@ def stereo_depth_map(rectified_pair):
     # filtered_disp = wls_filter.filter(disparity, dmLeft, disparity_map_right=right_disp);
     # filtered_disp = filtered_disp.astype(np.uint8)
     # filtered_disp = cv2.applyColorMap(filtered_disp, cv2.COLORMAP_JET)
-
-    #####################################################################################
-
+# 
     cv2.imshow("Image", disparity_color)
     cv2.setMouseCallback("Image", save_distance, disparity_color) # Mouse click
     key = cv2.waitKey(1) & 0xFF   
     if key == ord("q"):
         quit();
+    # return disparity_color
 
-# Loading saved Disparity parameters (Based on Individual settings)
 def load_map_settings( fName ):
     global SWS, PFS, PFC, MDS, NOD, TTH, UR, SR, SPWS, loading_settings
     print('Loading parameters from file...')
@@ -121,11 +116,19 @@ def load_map_settings( fName ):
     f.close()
     print ('Parameters loaded from file '+fName)
 
+
+
 load_map_settings("stereo/3dmap_set.txt")
 
-def runDisparity(frame_right,frame_left):
+
+def runDisparity(cap_right,cap_left):
     i = 0
     while(i < 300):
+        _, frame_right = cap_right.read()
+        _, frame_left = cap_left.read()
+        #print("Both frames read.")
+        #print(frame_right)
+        #print(frame_left)
         imgL = cv2.remap(frame_left, und_left, rect_left, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT) # rectify left image
         imgR = cv2.remap(frame_right, und_right, rect_right, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT) # rectify right image
         imgL_new = cv2.cvtColor(imgL, cv2.COLOR_BGR2GRAY)

@@ -120,8 +120,8 @@ def load_map_settings( fName ):
 
 load_map_settings("3dmap_set.txt")
 
-cap_right = cv2.VideoCapture(2)                    
-cap_left =  cv2.VideoCapture(4)
+cap_right = cv2.VideoCapture(0)                    
+cap_left =  cv2.VideoCapture(2)
 cap_right.set(3, 550)
 cap_right.set(4, 370)
 cap_left.set(3, 550)
