@@ -91,7 +91,7 @@ def tf_run(feed, model = 'obj_detect_pi/efficientdet_lite0.tflite', camera_id = 
       break
     cv2.imshow('object_detector', image)
 
-  cap.release()
+  #cap.release()
   cv2.destroyAllWindows()
   
   return coordinates
