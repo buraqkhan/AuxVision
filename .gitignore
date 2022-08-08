@@ -9,3 +9,4 @@ stereo/test_stereo.py
 MobileNet/mbnet_old.py
 Azure/key.txt
 Azure
+stereo/test_depth_video.py
